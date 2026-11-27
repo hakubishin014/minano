@@ -1,0 +1,816 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>里山わくわくパーク in Mahora稲穂山｜発表スライド</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;700;900&display=swap" rel="stylesheet">
+  <!-- PowerPoint (.pptx) 動的生成ライブラリ -->
+  <script src="https://cdn.jsdelivr.net/npm/pptxgenjs@3.12.0/dist/pptxgen.bundle.js"></script>
+  <style>
+    :root {
+      --bg: #FDFBF7;
+      --green: #2E6F40;
+      --green-light: #E8F3EB;
+      --brown: #8C5A2B;
+      --orange: #D97736;
+      --orange-light: #FDF1E6;
+      --card: #FFFFFF;
+      --border: #D8D2C5;
+      --text: #2C2C2C;
+      --sub: #666666;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Noto Sans JP', sans-serif;
+      background: #EFECE6;
+      color: var(--text);
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    /* 埋め込みラッパー */
+    .deck-wrapper {
+      width: 100%;
+      max-width: 960px;
+      background: #FFFFFF;
+      border-radius: 14px;
+      box-shadow: 0 8px 28px rgba(0, 0, 0, 0.1);
+      overflow: hidden;
+      border: 1px solid var(--border);
+    }
+
+    /* 上部ツールバー */
+    .toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      padding: 12px 18px;
+      background: var(--green);
+      color: #FFFFFF;
+    }
+
+    .toolbar-title {
+      font-size: 14px;
+      font-weight: 700;
+      letter-spacing: 0.02em;
+    }
+
+    .toolbar-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .btn {
+      border: none;
+      border-radius: 8px;
+      padding: 7px 13px;
+      font-size: 13px;
+      font-weight: 700;
+      font-family: inherit;
+      cursor: pointer;
+      transition: opacity 0.15s, transform 0.1s;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .btn:hover { opacity: 0.9; }
+    .btn:active { transform: scale(0.98); }
+
+    .btn-pptx { background: var(--orange); color: #FFFFFF; }
+    .btn-pdf { background: #FFFFFF; color: var(--green); }
+    .btn-ghost { background: rgba(255, 255, 255, 0.18); color: #FFFFFF; }
+
+    /* スライド表示ステージ（16:9固定） */
+    .stage-container {
+      width: 100%;
+      background: #222;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .slide-canvas {
+      position: relative;
+      width: 100%;
+      aspect-ratio: 16 / 9;
+      background: var(--bg);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      padding: 3.5% 4.5% 3%;
+    }
+
+    /* 表紙レイアウト */
+    .slide-canvas.is-cover {
+      flex-direction: row;
+      padding: 0;
+    }
+    .cover-bar {
+      width: 2.5%;
+      background: var(--green);
+      flex-shrink: 0;
+    }
+    .cover-main {
+      flex: 1;
+      padding: 5.5% 4% 5% 4.5%;
+      display: flex;
+      gap: 4%;
+      align-items: stretch;
+    }
+    .cover-left {
+      flex: 1.35;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      gap: 14px;
+    }
+    .cover-badge {
+      display: inline-block;
+      align-self: flex-start;
+      background: var(--green);
+      color: #fff;
+      font-size: clamp(10px, 1.3vw, 13px);
+      font-weight: 700;
+      padding: 5px 14px;
+      border-radius: 999px;
+    }
+    .cover-title {
+      font-size: clamp(20px, 3.4vw, 36px);
+      line-height: 1.25;
+      color: var(--green);
+      font-weight: 900;
+      white-space: pre-line;
+    }
+    .cover-sub {
+      background: var(--orange-light);
+      border: 1.5px solid var(--orange);
+      color: var(--brown);
+      font-size: clamp(11px, 1.5vw, 16px);
+      font-weight: 700;
+      padding: 10px 14px;
+      border-radius: 10px;
+      text-align: center;
+    }
+    .cover-meta {
+      font-size: clamp(10px, 1.25vw, 13px);
+      color: var(--sub);
+      line-height: 1.65;
+      white-space: pre-line;
+    }
+    .cover-right {
+      flex: 0.85;
+      display: flex;
+    }
+
+    /* 通常スライドヘッダー */
+    .slide-header {
+      margin-bottom: 2.6%;
+      border-bottom: 2.5px solid var(--green);
+      padding-bottom: 1.2%;
+    }
+    .slide-tag {
+      font-size: clamp(9px, 1.15vw, 12px);
+      font-weight: 700;
+      color: var(--orange);
+      margin-bottom: 2px;
+    }
+    .slide-title {
+      font-size: clamp(16px, 2.4vw, 26px);
+      font-weight: 900;
+      color: var(--green);
+      line-height: 1.25;
+    }
+
+    /* コンテンツ領域 */
+    .slide-body {
+      flex: 1;
+      display: flex;
+      gap: 3%;
+      min-height: 0;
+    }
+
+    .card {
+      flex: 1;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.8% 2.2%;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+    .card-head {
+      color: #FFFFFF;
+      font-size: clamp(11px, 1.45vw, 15px);
+      font-weight: 700;
+      text-align: center;
+      padding: 7px 10px;
+      border-radius: 8px;
+      margin-bottom: 3.5%;
+      flex-shrink: 0;
+    }
+    .card-head.green { background: var(--green); }
+    .card-head.orange { background: var(--orange); }
+    .card-head.brown { background: var(--brown); }
+
+    .card-text {
+      font-size: clamp(10px, 1.32vw, 14px);
+      line-height: 1.55;
+      white-space: pre-line;
+      color: var(--text);
+    }
+
+    /* 右画像レイアウト */
+    .body-left { flex: 1.35; }
+    .body-right { flex: 0.9; display: flex; }
+
+    .img-box {
+      width: 100%;
+      height: 100%;
+      border-radius: 12px;
+      border: 2px dashed var(--green);
+      background: var(--green-light);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 14px;
+      color: var(--green);
+      font-weight: 700;
+      font-size: clamp(10px, 1.3vw, 14px);
+      line-height: 1.5;
+      white-space: pre-line;
+      overflow: hidden;
+    }
+    .img-box img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      border-radius: 8px;
+    }
+    .img-box.has-img {
+      border-style: solid;
+      border-color: var(--border);
+      background: #FFFFFF;
+      padding: 6px;
+    }
+
+    /* エンディングレイアウト */
+    .ending-wrap {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 3%;
+    }
+    .vision-card {
+      background: var(--card);
+      border: 2px solid var(--orange);
+      border-radius: 12px;
+      padding: 2.5% 4%;
+      text-align: center;
+    }
+    .vision-title {
+      color: var(--orange);
+      font-size: clamp(13px, 1.8vw, 20px);
+      font-weight: 900;
+      margin-bottom: 8px;
+    }
+    .vision-body {
+      font-size: clamp(11px, 1.4vw, 15px);
+      line-height: 1.6;
+      white-space: pre-line;
+    }
+    .closing-band {
+      background: var(--green);
+      color: #FFFFFF;
+      border-radius: 12px;
+      padding: 2.5% 4%;
+      text-align: center;
+      font-size: clamp(12px, 1.65vw, 18px);
+      font-weight: 700;
+      line-height: 1.55;
+      white-space: pre-line;
+    }
+    .thanks-text {
+      text-align: center;
+      color: var(--brown);
+      font-size: clamp(14px, 2vw, 22px);
+      font-weight: 900;
+    }
+
+    /* フッター */
+    .slide-footer {
+      margin-top: 2%;
+      display: flex;
+      justify-content: space-between;
+      font-size: clamp(8px, 1vw, 11px);
+      color: var(--sub);
+    }
+
+    /* 下部ナビゲーション */
+    .controls {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px 18px;
+      background: #F7F5F0;
+      border-top: 1px solid var(--border);
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    .nav-group {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .btn-nav {
+      background: #FFFFFF;
+      color: var(--text);
+      border: 1px solid var(--border);
+    }
+    .btn-nav:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+    }
+    .page-indicator {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--green);
+      min-width: 72px;
+      text-align: center;
+    }
+
+    /* スピーカーノート欄 */
+    .notes-panel {
+      padding: 14px 20px;
+      background: #FFFDF8;
+      border-top: 1px solid var(--border);
+      font-size: 13.5px;
+      line-height: 1.7;
+      color: var(--text);
+    }
+    .notes-panel.hidden { display: none; }
+    .notes-label {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--brown);
+      margin-bottom: 4px;
+    }
+
+    /* 印刷（PDF保存）専用エリア */
+    #print-area { display: none; }
+
+    @media print {
+      @page { size: landscape; margin: 0; }
+      body { background: #FFFFFF; padding: 0; }
+      .deck-wrapper { display: none !important; }
+      #print-area { display: block !important; width: 100%; }
+      #print-area .slide-canvas {
+        width: 100vw;
+        height: 100vh;
+        aspect-ratio: auto;
+        page-break-after: always;
+        break-after: page;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="deck-wrapper" id="deckWrapper">
+    <!-- 上部ツールバー -->
+    <div class="toolbar">
+      <div class="toolbar-title">里山わくわくパーク in Mahora稲穂山（全11枚・10分発表）</div>
+      <div class="toolbar-actions">
+        <button class="btn btn-pptx" id="btnPptx">⬇ PowerPoint (.pptx) ダウンロード</button>
+        <button class="btn btn-pdf" id="btnPdf">🖨 PDF保存 / 印刷</button>
+        <button class="btn btn-ghost" id="btnFullscreen">⛶ 全画面</button>
+      </div>
+    </div>
+
+    <!-- スライド描画ステージ -->
+    <div class="stage-container">
+      <div class="slide-canvas" id="stage"></div>
+    </div>
+
+    <!-- ナビゲーション -->
+    <div class="controls">
+      <div class="nav-group">
+        <button class="btn btn-nav" id="btnPrev">◀ 前へ</button>
+        <span class="page-indicator" id="pageIndicator">1 / 11</span>
+        <button class="btn btn-nav" id="btnNext">次へ ▶</button>
+      </div>
+      <div class="nav-group">
+        <button class="btn btn-nav" id="btnToggleNotes">📝 発表原稿を隠す</button>
+      </div>
+    </div>
+
+    <!-- 発表原稿（スピーカーノート） -->
+    <div class="notes-panel" id="notesPanel">
+      <div class="notes-label">発表原稿（スピーカーノート）</div>
+      <div id="notesText"></div>
+    </div>
+  </div>
+
+  <!-- 印刷（PDF保存）用に全11枚を並べるコンテナ -->
+  <div id="print-area"></div>
+
+  <script>
+    // =========================================================
+    // 画像を差し込みたい場合は、同じフォルダに画像を置いて
+    // ファイル名（またはURL）をここに記入してください（空文字なら枠を表示）
+    // =========================================================
+    const IMAGES = {
+      poster: '', // 例: 'poster.jpg'
+      gacha: ''   // 例: 'gacha-sample.jpg'
+    };
+
+    // 全11枚スライドデータ
+    const SLIDES = [
+      {
+        type: 'cover',
+        badge: '皆野教育シンポジウム 1班 発表',
+        title: '里山わくわくパーク\nin Mahora稲穂山（仮）',
+        subtitle: '〜のんびり、わくわく、みんなの居場所。〜',
+        meta: 'テーマ：ムクゲ公園と木を利用してテーマパークを作る\n会場：リトリートフィールド Mahora稲穂山（旧ムクゲ自然公園）',
+        imageKey: 'poster',
+        placeholder: '【画像枠】\n作成した活性化ポスターを\nここに挿入',
+        notes: 'こんにちは、1班です。私たちは「ムクゲ公園と木を利用してテーマパークを作る」をテーマに、リトリートフィールド Mahora稲穂山を舞台とした企画を考えました。キャッチコピーは「のんびり、わくわく、みんなの居場所。」です。子どもから大人、観光客までみんなが集まりたくなる企画を発表します。（目安：30秒）'
+      },
+      {
+        type: 'twoCard',
+        tag: '01 / 背景と目的',
+        title: '企画の背景と目指す姿',
+        leftTitle: '解決したいこと・狙い',
+        leftColor: 'green',
+        leftBody: '・皆野の豊かな自然や「木」の魅力を、\n 遊びと食を通じて体感してもらう\n\n・1回限りのイベントで終わらせず、\n 地域の人にも定期的に来てもらう場所にする\n\n・基本入場料は「約0円（無料）」を基本とし、\n 誰でもふらっと立ち寄れる場を目指す',
+        rightTitle: '想定するターゲット',
+        rightColor: 'orange',
+        rightBody: '・子ども連れファミリー\n\n・若者、観光客\n\n・お一人様でのんびり過ごしたい人\n\n・子ども食堂を利用する子どもたち\n\n→ 世代や立場を問わず「みんなの居場所」へ',
+        notes: 'この企画が目指すのは、観光客だけでなく地域の人も「また来たい」と思える居場所づくりです。子ども連れから一人でのんびりしたい方まで幅広い客層を想定し、基本入場料を無料に近づけることで、誰でもふらっと立ち寄れるハードルの低さを大切にしました。（目安：45秒）'
+      },
+      {
+        type: 'twoCard',
+        tag: '02 / 空間と仕組み',
+        title: '空間設計とリピートの仕掛け',
+        leftTitle: '会場のゾーニング（「森のホール」等）',
+        leftColor: 'green',
+        leftBody: '客層や目的に合わせて空間・部屋を明確に分割：\n\n① 飲食OKエリア\n 地元グルメやカフェをゆっくり楽しむ空間\n\n② 飲み物・持ち込みのみOKエリア\n 休憩や会話を楽しむくつろぎ空間\n\n③ 飲食NGエリア\n 木製遊具や遊びに思いきり集中できる空間',
+        rightTitle: '定期的に来てもらう工夫',
+        rightColor: 'brown',
+        rightBody: '・安心して遊べる「キッズスペース」を常設\n\n・地域の「子ども食堂」に定期的に来てもらう\n 仕組みづくり\n\n・「はじめてのおつかい」体験など、\n 子どもの成長に合わせて何度も楽しめる企画\n\n・季節ごとの食材や体験の入れ替え',
+        notes: '会場のMahora稲穂山では、森のホールや各部屋を活かして空間を分けます。食事を楽しむエリア、飲み物だけでくつろぐエリア、飲食NGで思いきり遊ぶエリアを分けることで、誰もが快適に過ごせます。また、キッズスペースや子ども食堂との連携により、定期的に足を運んでもらえる仕組みを作ります。（目安：50秒）'
+      },
+      {
+        type: 'twoCard',
+        tag: '03 / 木の活用法①',
+        title: '自然のあそび＆アスレチック',
+        leftTitle: '体を動かして遊ぶ大型遊具',
+        leftColor: 'green',
+        leftBody: '・丸太滑り台\n\n・グラグラ丸太（※安全基準を大人と検証）\n\n・木のトンネル\n\n・反り立つ壁\n\n・SASUKEのような本格アスレチック要素\n → 子どもから若者まで夢中になれる体験',
+        rightTitle: '世代を超えて楽しむ木製ゲーム',
+        rightColor: 'orange',
+        rightBody: '・モルック（木の棒を投げる人気スポーツ）\n\n・木の積み木コーナー\n\n・木で作る「○×ゲーム」\n\n\n小さな子どもから高齢者まで、\n同じ場所で一緒に遊べる設計にします。',
+        notes: 'ここからは、企画の柱である「木の活用法」を紹介します。まず遊びエリアでは、丸太滑り台やトンネル、さらにSASUKEのようなアスレチック遊具で思いきり体を動かせます。また、小さなお子さんから高齢者まで一緒に楽しめるよう、積み木やモルック、木製の○×ゲームも用意します。（目安：1分）'
+      },
+      {
+        type: 'twoCard',
+        tag: '04 / 木の活用法②',
+        title: 'つくって・めぐる里山体験',
+        leftTitle: '木と竹を活かしたクラフト＆体験',
+        leftColor: 'brown',
+        leftBody: '・木を「動物の形」に加工したオブジェづくり\n\n・施設内で使う木製の「掛け札」づくり\n\n・きのこの打ちつけ体験\n\n・竹を活用した工作・装飾\n\n・寒い季節に温まれる「まきストーブ」',
+        rightTitle: '園内をめぐるワクワク企画',
+        rightColor: 'green',
+        rightBody: '・園内スタンプラリー\n 広いフィールドを歩き回るきっかけに\n\n・木で作る「恋みくじ」\n 若者や観光客にも人気の写真映え企画\n\n・木製の「目印チャーム」づくり\n お土産として持ち帰れる思い出の品',
+        notes: '遊ぶだけでなく、木や竹そのものを活かした体験も豊富に考えました。木を動物の形にしたり、掛け札や目印チャームを作ったり、きのこの打ちつけ体験やまきストーブなど、里山ならではの体験ができます。さらに恋みくじやスタンプラリーを入れることで、園内全体をめぐる楽しさを広げます。（目安：50秒）'
+      },
+      {
+        type: 'twoCard',
+        tag: '05 / 食の魅力',
+        title: '地元グルメ＆給食風カフェメニュー',
+        leftTitle: '軽食・スイーツ（ワンコイン以下目安）',
+        leftColor: 'orange',
+        leftBody: '・揚げパン（懐かしの給食スタイル）\n\n・みそポテト（食べ歩きしやすいカップ入り）\n\n・おなめみその焼きおにぎり\n\n・ミニクリームソーダ\n\n※一部テイクアウト対応で園内でも気軽に！',
+        rightTitle: 'しっかり食事（皆野食材×給食風）',
+        rightColor: 'green',
+        rightBody: '・ジビエとキノコの「給食風ソフト麺」\n\n・しゃくし菜とベーコンの鉄板ナポリタン\n\n・季節食材（ぶどう・しいたけ・まいたけ等）や\n うどん・そばも展開予定\n\n※辛さなどは「セルフカスタム」で好みの味に！',
+        notes: '次は食の魅力です。皆野ならではの食材と、懐かしさのある学校給食風を掛け合わせたメニューを考えました。ワンコイン以下で買える揚げパン、カップ入りのみそポテト、おなめみその焼きおにぎり、ミニクリームソーダに加え、しっかり食事としてジビエとキノコの「給食風ソフト麺」や「しゃくし菜とベーコンの鉄板ナポリタン」を提供します。辛さなどのセルフカスタムやテイクアウトにも対応します。（目安：1分15秒）'
+      },
+      {
+        type: 'twoCard',
+        tag: '06 / 安心・安全',
+        title: '安心・安全への徹底したこだわり',
+        leftTitle: '木を使う上での安全・衛生対策',
+        leftColor: 'brown',
+        leftBody: '・遊具や木工作品は事前に「トゲ」などを\n 徹底的に取り除く\n\n・小さな子どもが触れる木のおもちゃは\n 定期的にしっかり消毒する\n\n・グラグラ丸太などの大型遊具は、\n 大人の協力を得て安全基準を必ず検証する',
+        rightTitle: '食のアレルギー対策',
+        rightColor: 'green',
+        rightBody: '・アレルギーの「見える化」\n 文字だけでなくイラストを使って、\n 子どもにも一目でわかる表示にする\n\n・「アレルギー事故を防ぐマニュアル」を作成\n\n→ アレルギーがある人もない人も、\n 同じテーブルで安心して食べられる環境へ',
+        notes: '木と食を扱う上で、私たちが特に重視したのが安全面です。木材はトゲを徹底的に取り除き、積み木などのおもちゃはこまめに消毒します。また、飲食ではアレルギーのある方も同じテーブルで安心して食べられるよう、イラストを使った「アレルギーの見える化」と、事故を防ぐためのマニュアル作成に取り組みます。（目安：1分）'
+      },
+      {
+        type: 'imageRight',
+        tag: '07 / 集客の目玉',
+        title: '話題を生む！「マニアックなガチャガチャ」',
+        body: '【企画概要】1回300円（目安）・期間限定\n皆野愛とユーモアでSNSシェアを狙う目玉企画！\n\n【ラインナップ案】\n・皆野の特産品や木で作った「めじるしチャーム」\n・学校の先生や皆野の人をモデルにした\n 「証明写真風アクリルスタンド」（シークレットあり）\n\n【パーク外への展開戦略】\n会場だけでなく「皆野駅」や「西武秩父駅」にも\n期間限定で設置し、気になった人をパークへ誘導！',
+        imageKey: 'gacha',
+        placeholder: '【画像枠】\n「いぶき・清野蓮\nアクリルスタンドコレクション」\n試作画像をここに挿入',
+        notes: 'ここで、思わずSNSでシェアしたくなる集客の目玉企画を紹介します。それが「マニアックなガチャガチャ」です。皆野の特産品のめじるしチャームに加え、なんと学校の先生や皆野の人をモデルにした証明写真風のアクリルスタンドを作ります。画面にあるのが試作イメージです！これを会場だけでなく、西武秩父駅や地元の駅にも期間限定で置くことで、思わず気になってパークへ来たくなる導線を作ります。（目安：1分15秒）'
+      },
+      {
+        type: 'imageRight',
+        tag: '08 / 広報戦略',
+        title: 'SNS×ポスターで届ける広報戦略',
+        body: '【オンライン発信（SNS）】\n・Instagram：\n 皆野町の広報担当の方にご協力いただき、\n 町の公式アカウントからも広く発信\n・TikTok：\n 生徒自らがショート動画を撮影・投稿\n （ガチャ紹介・遊具体験・グルメレポなど）\n\n【オフライン周知（紙媒体）】\n・ポスターと連動したデザインのチラシを制作\n・皆野駅前や町内の各所に掲示して幅広い世代へ',
+        imageKey: 'poster',
+        placeholder: '【画像枠】\n作成したポスター案や\nSNS発信イメージを\nここに挿入',
+        notes: '広報はオンラインとオフラインの両面で行います。町の広報担当の方にご協力いただきInstagramで発信しつつ、私たち生徒がTikTokで楽しい動画を撮って広めます。また、ポスターと同じデザインでチラシを作り、駅や町中に貼ることで幅広い世代に届けます。（目安：50秒）'
+      },
+      {
+        type: 'twoCard',
+        tag: '09 / 運営体制',
+        title: '役割分担と今後の課題',
+        leftTitle: '生徒が主体となってできること',
+        leftColor: 'green',
+        leftBody: '・当日の接客、案内\n\n・オープン前の掃除、環境整備\n\n・キッズスペースや遊びコーナーの運営\n\n・ポスターやチラシのデザイン制作\n\n・TikTok動画の撮影、木製クラフトづくり',
+        rightTitle: '大人にお願いしたいこと・検討課題',
+        rightColor: 'orange',
+        rightBody: '・大型遊具の設営と安全性の最終確認\n\n・調理オペレーション、衛生管理、\n アレルギー対応マニュアルの監修\n\n・お金の管理、メニューの最終価格設定\n\n・施設・駅・町広報との正式な連携調整',
+        notes: '実現に向けた役割分担です。接客や掃除、デザイン、動画発信などは私たち生徒が主体となって動きます。一方で、大型遊具の安全確認、調理やアレルギーマニュアルの監修、お金の管理、駅や町との調整については、ぜひ地域の大人や専門家の皆さんの力をお借りしたいと考えています。（目安：55秒）'
+      },
+      {
+        type: 'ending',
+        tag: '10 / 未来のビジョン',
+        title: 'さらに広がる皆野の未来へ',
+        visionTitle: '将来の大きな夢：「雲海につながるロープウェイ」',
+        visionBody: 'このパークをきっかけに皆野の魅力がさらに広がれば、\n皆野の絶景を活かした「雲海につながるロープウェイ」など、\n地域全体をつなぐ新たな観光の目玉へ発展させる構想も描いています。',
+        closing: '「木」×「食」×「安全」×「マニアックな面白さ」\n〜のんびり、わくわく、みんなの居場所。〜 を一緒に作りましょう！',
+        thanks: 'ご清聴ありがとうございました',
+        notes: '最後に、私たちが描くさらに先の未来です。このパークをきっかけに皆野の魅力が広がれば、将来的には皆野の名物である「雲海につながるロープウェイ」のような大きな夢にもつながっていくかもしれません。自然のぬくもりとユーモアがあふれる「みんなの居場所」を実現できるよう、これからも企画を磨いていきます。ご清聴ありがとうございました。（目安：50秒）'
+      }
+    ];
+
+    let currentIdx = 0;
+
+    // 1枚のスライドHTMLを生成
+    function buildSlideHTML(data, index) {
+      const pageNum = index + 1;
+      const total = SLIDES.length;
+      const imgSrc = data.imageKey ? IMAGES[data.imageKey] : '';
+      const imgHTML = imgSrc
+        ? `<div class="img-box has-img"><img src="${imgSrc}" alt=""></div>`
+        : `<div class="img-box">${escapeHTML(data.placeholder || '')}</div>`;
+
+      if (data.type === 'cover') {
+        return `
+          <div class="cover-bar"></div>
+          <div class="cover-main">
+            <div class="cover-left">
+              <span class="cover-badge">${escapeHTML(data.badge)}</span>
+              <h1 class="cover-title">${escapeHTML(data.title)}</h1>
+              <div class="cover-sub">${escapeHTML(data.subtitle)}</div>
+              <div class="cover-meta">${escapeHTML(data.meta)}</div>
+            </div>
+            <div class="cover-right">${imgHTML}</div>
+          </div>
+        `;
+      }
+
+      const header = `
+        <div class="slide-header">
+          <div class="slide-tag">${escapeHTML(data.tag)}</div>
+          <h2 class="slide-title">${escapeHTML(data.title)}</h2>
+        </div>
+      `;
+      const footer = `
+        <div class="slide-footer">
+          <span>皆野教育シンポジウム 1班｜里山わくわくパーク in Mahora稲穂山</span>
+          <strong>${pageNum} / ${total}</strong>
+        </div>
+      `;
+
+      if (data.type === 'twoCard') {
+        return `
+          ${header}
+          <div class="slide-body">
+            <div class="card">
+              <div class="card-head ${data.leftColor}">${escapeHTML(data.leftTitle)}</div>
+              <div class="card-text">${escapeHTML(data.leftBody)}</div>
+            </div>
+            <div class="card">
+              <div class="card-head ${data.rightColor}">${escapeHTML(data.rightTitle)}</div>
+              <div class="card-text">${escapeHTML(data.rightBody)}</div>
+            </div>
+          </div>
+          ${footer}
+        `;
+      }
+
+      if (data.type === 'imageRight') {
+        return `
+          ${header}
+          <div class="slide-body">
+            <div class="card body-left">
+              <div class="card-text">${escapeHTML(data.body)}</div>
+            </div>
+            <div class="body-right">${imgHTML}</div>
+          </div>
+          ${footer}
+        `;
+      }
+
+      if (data.type === 'ending') {
+        return `
+          ${header}
+          <div class="ending-wrap">
+            <div class="vision-card">
+              <div class="vision-title">${escapeHTML(data.visionTitle)}</div>
+              <div class="vision-body">${escapeHTML(data.visionBody)}</div>
+            </div>
+            <div class="closing-band">${escapeHTML(data.closing)}</div>
+            <div class="thanks-text">${escapeHTML(data.thanks)}</div>
+          </div>
+          ${footer}
+        `;
+      }
+      return '';
+    }
+
+    function escapeHTML(str) {
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;');
+    }
+
+    // 現在のスライドを描画
+    function render() {
+      const stage = document.getElementById('stage');
+      const data = SLIDES[currentIdx];
+      stage.className = 'slide-canvas' + (data.type === 'cover' ? ' is-cover' : '');
+      stage.innerHTML = buildSlideHTML(data, currentIdx);
+
+      document.getElementById('pageIndicator').textContent = `${currentIdx + 1} / ${SLIDES.length}`;
+      document.getElementById('btnPrev').disabled = currentIdx === 0;
+      document.getElementById('btnNext').disabled = currentIdx === SLIDES.length - 1;
+      document.getElementById('notesText').textContent = data.notes || '';
+    }
+
+    // 印刷用エリアに全11枚を展開
+    function buildPrintArea() {
+      const area = document.getElementById('print-area');
+      area.innerHTML = SLIDES.map((s, i) => `
+        <div class="slide-canvas ${s.type === 'cover' ? 'is-cover' : ''}">
+          ${buildSlideHTML(s, i)}
+        </div>
+      `).join('');
+    }
+
+    // PowerPoint (.pptx) 生成＆ダウンロード
+    function downloadPPTX() {
+      if (typeof PptxGenJS === 'undefined') {
+        alert('PowerPoint生成ライブラリの読み込みに失敗しました。インターネット接続を確認してください。');
+        return;
+      }
+
+      const pptx = new PptxGenJS();
+      pptx.layout = 'LAYOUT_16x9'; // 10 x 5.625 inch
+      pptx.title = '里山わくわくパーク in Mahora稲穂山';
+      pptx.author = '皆野教育シンポジウム 1班';
+
+      const C = {
+        bg: 'FDFBF7',
+        green: '2E6F40',
+        greenLight: 'E8F3EB',
+        brown: '8C5A2B',
+        orange: 'D97736',
+        orangeLight: 'FDF1E6',
+        card: 'FFFFFF',
+        border: 'D8D2C5',
+        text: '2C2C2C',
+        sub: '666666'
+      };
+      const FONT = 'Meiryo';
+
+      SLIDES.forEach((d, idx) => {
+        const slide = pptx.addSlide();
+        slide.background = { color: C.bg };
+        if (d.notes) slide.addNotes(d.notes);
+
+        const pageText = `${idx + 1} / ${SLIDES.length}`;
+
+        if (d.type === 'cover') {
+          slide.addShape(pptx.ShapeType.rect, { x: 0, y: 0, w: 0.25, h: 5.625, fill: { color: C.green }, line: { type: 'none' } });
+          slide.addShape(pptx.ShapeType.roundRect, { x: 0.6, y: 0.55, w: 3.2, h: 0.38, fill: { color: C.green }, line: { type: 'none' } });
+          slide.addText(d.badge, { x: 0.6, y: 0.55, w: 3.2, h: 0.38, fontFace: FONT, fontSize: 11, bold: true, color: 'FFFFFF', align: 'center', valign: 'middle' });
+
+          slide.addText(d.title, { x: 0.6, y: 1.15, w: 5.6, h: 1.5, fontFace: FONT, fontSize: 30, bold: true, color: C.green, lineSpacingMultiple: 1.2 });
+
+          slide.addShape(pptx.ShapeType.roundRect, { x: 0.6, y: 2.85, w: 5.4, h: 0.58, fill: { color: C.orangeLight }, line: { color: C.orange, pt: 1.5 } });
+          slide.addText(d.subtitle, { x: 0.6, y: 2.85, w: 5.4, h: 0.58, fontFace: FONT, fontSize: 14, bold: true, color: C.brown, align: 'center', valign: 'middle' });
+
+          slide.addText(d.meta, { x: 0.6, y: 3.75, w: 5.5, h: 1.1, fontFace: FONT, fontSize: 12, color: C.sub, lineSpacingMultiple: 1.4 });
+
+          addPptxImageOrBox(slide, pptx, d.imageKey, d.placeholder, 6.45, 0.55, 3.05, 4.45, C, FONT);
+          return;
+        }
+
+        // 共通ヘッダー
+        slide.addText(d.tag, { x: 0.45, y: 0.2, w: 4, h: 0.25, fontFace: FONT, fontSize: 10, bold: true, color: C.orange });
+        slide.addText(d.title, { x: 0.45, y: 0.45, w: 9.1, h: 0.5, fontFace: FONT, fontSize: 22, bold: true, color: C.green });
+        slide.addShape(pptx.ShapeType.rect, { x: 0.45, y: 1.02, w: 9.1, h: 0.03, fill: { color: C.green }, line: { type: 'none' } });
+
+        // 共通フッター
+        slide.addText('皆野教育シンポジウム 1班｜里山わくわくパーク in Mahora稲穂山', { x: 0.45, y: 5.22, w: 7, h: 0.25, fontFace: FONT, fontSize: 9, color: C.sub });
+        slide.addText(pageText, { x: 8.5, y: 5.22, w: 1.05, h: 0.25, fontFace: FONT, fontSize: 9, bold: true, color: C.sub, align: 'right' });
+
+        if (d.type === 'twoCard') {
+          addPptxCard(slide, pptx, 0.45, 1.25, 4.4, 3.8, d.leftTitle, d.leftBody, C[d.leftColor], C, FONT);
+          addPptxCard(slide, pptx, 5.15, 1.25, 4.4, 3.8, d.rightTitle, d.rightBody, C[d.rightColor], C, FONT);
+        } else if (d.type === 'imageRight') {
+          slide.addShape(pptx.ShapeType.roundRect, { x: 0.45, y: 1.25, w: 5.5, h: 3.8, fill: { color: C.card }, line: { color: C.border, pt: 1 } });
+          slide.addText(d.body, { x: 0.65, y: 1.42, w: 5.1, h: 3.45, fontFace: FONT, fontSize: 12, color: C.text, valign: 'top', lineSpacingMultiple: 1.35 });
+          addPptxImageOrBox(slide, pptx, d.imageKey, d.placeholder, 6.2, 1.25, 3.35, 3.8, C, FONT);
+        } else if (d.type === 'ending') {
+          slide.addShape(pptx.ShapeType.roundRect, { x: 0.65, y: 1.3, w: 8.7, h: 1.65, fill: { color: C.card }, line: { color: C.orange, pt: 2 } });
+          slide.addText(d.visionTitle, { x: 0.85, y: 1.45, w: 8.3, h: 0.4, fontFace: FONT, fontSize: 16, bold: true, color: C.orange, align: 'center' });
+          slide.addText(d.visionBody, { x: 0.85, y: 1.92, w: 8.3, h: 0.9, fontFace: FONT, fontSize: 13, color: C.text, align: 'center', lineSpacingMultiple: 1.35 });
+
+          slide.addShape(pptx.ShapeType.roundRect, { x: 0.65, y: 3.2, w: 8.7, h: 1.05, fill: { color: C.green }, line: { type: 'none' } });
+          slide.addText(d.closing, { x: 0.85, y: 3.2, w: 8.3, h: 1.05, fontFace: FONT, fontSize: 15, bold: true, color: 'FFFFFF', align: 'center', valign: 'middle', lineSpacingMultiple: 1.35 });
+
+          slide.addText(d.thanks, { x: 0.65, y: 4.48, w: 8.7, h: 0.5, fontFace: FONT, fontSize: 18, bold: true, color: C.brown, align: 'center' });
+        }
+      });
+
+      pptx.writeFile({ fileName: '里山わくわくパーク_発表スライド.pptx' });
+    }
+
+    function addPptxCard(slide, pptx, x, y, w, h, title, body, accent, C, FONT) {
+      slide.addShape(pptx.ShapeType.roundRect, { x, y, w, h, fill: { color: C.card }, line: { color: C.border, pt: 1 } });
+      slide.addShape(pptx.ShapeType.roundRect, { x: x + 0.14, y: y + 0.14, w: w - 0.28, h: 0.46, fill: { color: accent }, line: { type: 'none' } });
+      slide.addText(title, { x: x + 0.14, y: y + 0.14, w: w - 0.28, h: 0.46, fontFace: FONT, fontSize: 13, bold: true, color: 'FFFFFF', align: 'center', valign: 'middle' });
+      slide.addText(body, { x: x + 0.18, y: y + 0.72, w: w - 0.36, h: h - 0.85, fontFace: FONT, fontSize: 12, color: C.text, valign: 'top', lineSpacingMultiple: 1.32 });
+    }
+
+    function addPptxImageOrBox(slide, pptx, imageKey, placeholder, x, y, w, h, C, FONT) {
+      const src = imageKey ? IMAGES[imageKey] : '';
+      if (src) {
+        slide.addImage({ path: src, x, y, w, h, sizing: { type: 'contain', w, h } });
+      } else {
+        slide.addShape(pptx.ShapeType.roundRect, { x, y, w, h, fill: { color: C.greenLight }, line: { color: C.green, pt: 1.5, dashType: 'dash' } });
+        slide.addText(placeholder, { x, y, w, h, fontFace: FONT, fontSize: 12, bold: true, color: C.green, align: 'center', valign: 'middle', lineSpacingMultiple: 1.35 });
+      }
+    }
+
+    // イベント登録
+    document.getElementById('btnPrev').addEventListener('click', () => {
+      if (currentIdx > 0) { currentIdx--; render(); }
+    });
+    document.getElementById('btnNext').addEventListener('click', () => {
+      if (currentIdx < SLIDES.length - 1) { currentIdx++; render(); }
+    });
+    document.getElementById('btnPptx').addEventListener('click', downloadPPTX);
+    document.getElementById('btnPdf').addEventListener('click', () => window.print());
+    document.getElementById('btnFullscreen').addEventListener('click', () => {
+      const el = document.getElementById('deckWrapper');
+      if (!document.fullscreenElement) {
+        el.requestFullscreen?.();
+      } else {
+        document.exitFullscreen?.();
+      }
+    });
+    document.getElementById('btnToggleNotes').addEventListener('click', (e) => {
+      const panel = document.getElementById('notesPanel');
+      panel.classList.toggle('hidden');
+      e.target.textContent = panel.classList.contains('hidden') ? '📝 発表原稿を表示' : '📝 発表原稿を隠す';
+    });
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowRight' || e.key === 'PageDown') {
+        if (currentIdx < SLIDES.length - 1) { currentIdx++; render(); }
+      } else if (e.key === 'ArrowLeft' || e.key === 'PageUp') {
+        if (currentIdx > 0) { currentIdx--; render(); }
+      }
+    });
+
+    // 初期描画
+    render();
+    buildPrintArea();
+  </script>
+</body>
+</html>
